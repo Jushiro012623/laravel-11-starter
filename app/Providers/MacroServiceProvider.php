@@ -8,6 +8,9 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 
+
+
+
 class MacroServiceProvider extends ServiceProvider
 {
     /**

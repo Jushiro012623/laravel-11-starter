@@ -17,7 +17,13 @@ abstract class QueryFilters
         $this->request = $request;
     }
 
-    public function apply(Builder $builder)
+    /**
+         * Applies all filter methods to the query builder based on request parameters.
+         *
+         * @param Builder $builder The Eloquent query builder instance.
+         * @return Builder The filtered query builder.
+    */
+    public function apply(Builder $builder): Builder
     {
         $this->builder = $builder;
 
@@ -30,7 +36,16 @@ abstract class QueryFilters
         return $builder;
     }
 
-    protected function sort($value) 
+    /**
+         * Applies sorting to the query builder based on the 'sort' parameter.
+         *
+         * Supports comma-separated attributes, with optional '-' prefix for descending order.
+         * Only attributes listed in $sortable are allowed.
+         *
+         * @param string $value The sort parameter value from the request.
+         * @return void
+    */
+    protected function sort($value): void
     {
         $sortAttributes = explode("," , $value);
 
