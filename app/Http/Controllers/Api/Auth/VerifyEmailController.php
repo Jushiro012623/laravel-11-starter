@@ -33,6 +33,8 @@ class VerifyEmailController extends Controller
         $otp = OTP::numeric()->generate();
         $otp["otp_code"] = $this->inLocalState ? $otp["otp_code"] : null;
         
+        // SEND EMAIL 
+
         $this->logger->info("Email Verification Code Was Sent", ["user_email" => Auth::user()->email ]);
         return Response::success("Verification Code Was Sent Successfully", $otp);
     }

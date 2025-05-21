@@ -34,6 +34,8 @@ class ForgotPasswordController extends Controller
         $otp = OTP::salt($email)->generate();
         $otp["otp_code"] = $this->inLocalState ? $otp["otp_code"] : null;
         
+        // TODO SEND EMAIL 
+
         $this->logger->info("Reset Password OTP Was Sent", ["user_email" => $email]);
         return Response::success("Forgot Password OTP Sent Successfully", $otp);
     }
@@ -52,7 +54,6 @@ class ForgotPasswordController extends Controller
         $this->userRepository->updateUserPassword($validated["password"], $user);
 
         $this->logger->info("User Forgotted Password Changed Successfully", ["user_id" => $user->id]);
-        
         return Response::success("Password Changed Successfully");
         
     }

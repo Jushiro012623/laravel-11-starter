@@ -13,6 +13,12 @@ class OTPService
     private $otpLength = 6;
     private $otpPrefix = "OTP";
     private $salt = "";
+    private $timezone = 'Asia/Manila';
+
+    public function timezone(string $tz) {
+        $this->timezone = $tz;
+        return $this;
+    }
 
     public function expiration($expiration) {
         $this->expiration = $expiration;
@@ -46,7 +52,7 @@ class OTPService
     */
     private function getTime(): Carbon
     {
-        return Carbon::now("Asia/Manila");
+        return Carbon::now($this->timezone);
     }
 
     /**
@@ -67,7 +73,7 @@ class OTPService
 
         $otpReference = Str::upper($this->otpPrefix . $timeNow->format("YmdHis") . Str::random($this->otpLength));
         
-        $data = ["otp_reference_no" => $otpReference, "otp_code" => $otpCode,"otp_time" => $timeNow->timestamp];
+        $data = ["otp_reference_no" => $otpReference, "otp_code" => $otpCode, "otp_time" => $timeNow->timestamp];
 
         $data["otp_hd"] = $this->hash($data, $this->salt);
 
@@ -75,7 +81,7 @@ class OTPService
     }
 
     /**
-         * Create a SHA-1 hash from OTP data.
+         * Create a HASH_MAC hash from OTP data.
          *
          * @param  array $otp
          * @param  string $salt
