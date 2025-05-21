@@ -30,7 +30,7 @@ class VerifyEmailController extends Controller
             return Response::fail("This Email is Already Verified", status: 400);
         }
 
-        $otp = OTP::generate();
+        $otp = OTP::numeric()->generate();
         $otp["otp_code"] = $this->inLocalState ? $otp["otp_code"] : null;
         
         $this->logger->info("Email Verification Code Was Sent", ["user_email" => Auth::user()->email ]);
@@ -43,7 +43,7 @@ class VerifyEmailController extends Controller
 
         $user = Auth::user();
 
-        if(!OTP::validate($validated, $validated["otp_code"]))
+        if(!OTP::validate($validated))
         {
             $this->logger->warning("Verify Email Failed: Expired or Invalid OTP", ["email" => $user->email]);
             return Response::fail(message: 'Expired or Invalid OTP', status: 400);

@@ -31,7 +31,7 @@ class ForgotPasswordController extends Controller
 
         $email = $request->validated("email");
 
-        $otp = OTP::generate(true, salt: $email);
+        $otp = OTP::salt($email)->generate();
         $otp["otp_code"] = $this->inLocalState ? $otp["otp_code"] : null;
         
         $this->logger->info("Reset Password OTP Was Sent", ["user_email" => $email]);
@@ -42,7 +42,7 @@ class ForgotPasswordController extends Controller
     {
         $validated = $request->validated();
 
-        if(! OTP::validate($validated, $validated["otp_code"], salt: $validated["email"]))
+        if(! OTP::salt($validated['email'])->validate($validated))
         {
             $this->logger->warning("Reset Password Failed: Expired or Invalid OTP", ["email" => $request->validated("email")]);
             return Response::fail(message: "Expired or Invalid OTP", status: 400);

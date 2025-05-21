@@ -7,6 +7,38 @@ use Illuminate\Support\Str;
 
 class OTPService
 {
+
+    private $expiration = 300;
+    private $isNumeric = false;
+    private $otpLength = 6;
+    private $otpPrefix = "OTP";
+    private $salt = "";
+
+    public function expiration($expiration) {
+        $this->expiration = $expiration;
+        return $this;
+    }
+
+    public function numeric() {
+        $this->isNumeric = true;
+        return $this;
+    }
+
+    public function length($otpLength) {
+        $this->otpLength = $otpLength;
+        return $this;
+    }
+
+    public function prefix($otpPrefix) {
+        $this->otpPrefix = $otpPrefix;
+        return $this;
+    }
+
+    public function salt($salt) {
+        $this->salt = $salt;
+        return $this;
+    }
+
     /**
          * Get current time in Asia/Manila timezone.
          *
@@ -25,19 +57,19 @@ class OTPService
          * @param  string $otpPrefix
          * @return array
     */
-    public function generate(bool $numeric = false, int $otpLength = 6, string $otpPrefix = "OTP", $salt = ""): array
+    public function generate(): array
     {
         $timeNow = $this->getTime();
 
-        $otpCode = $numeric
-            ? str_pad(random_int(0, 10 ** $otpLength - 1), $otpLength, "0", STR_PAD_LEFT)
-            : Str::upper(Str::random($otpLength));
+        $otpCode = $this->isNumeric
+            ? str_pad(random_int(0, 10 ** $this->otpLength - 1), $this->otpLength, "0", STR_PAD_LEFT)
+            : Str::upper(Str::random($this->otpLength));
 
-        $otpReference = Str::upper($otpPrefix . $timeNow->format("YmdHis") . Str::random($otpLength));
+        $otpReference = Str::upper($this->otpPrefix . $timeNow->format("YmdHis") . Str::random($this->otpLength));
         
         $data = ["otp_reference_no" => $otpReference, "otp_code" => $otpCode,"otp_time" => $timeNow->timestamp];
 
-        $data["otp_hd"] = $this->hash($data, $salt);
+        $data["otp_hd"] = $this->hash($data, $this->salt);
 
         return $data;
     }
@@ -49,9 +81,10 @@ class OTPService
          * @param  string $salt
          * @return string
     */
-    public function hash(array $otp, $salt = ""): string
+    public function hash(array $otp, string|null $salt = null): string
     {
-        return sha1($otp["otp_reference_no"] . $otp["otp_code"] . $otp["otp_time"]. $salt);
+        $salt ??= $this->salt;
+        return hash_hmac('sha256', $otp["otp_reference_no"] . $otp["otp_code"] . $otp["otp_time"], $salt);
     }
 
     /**
@@ -62,17 +95,17 @@ class OTPService
          * @param  int    $expiration
          * @return bool
     */
-    public function validate(array $otp, string $inputCode, int $expiration = 300, $salt = ""): bool
+    public function validate(array $otp): bool
     {
-        if (!$this->verifyHash($otp, $salt)) {
+        if (!$this->verifyHash($otp, $this->salt)) {
             return false;
         }
 
-        if ($this->isExpired($otp, $expiration)) {
+        if ($this->isExpired($otp, $this->expiration)) {
             return false;
         }
 
-        return $otp["otp_code"] === $inputCode;
+        return true;
     }
 
     /**
@@ -83,9 +116,9 @@ class OTPService
          * @return bool
          * @return true if expired.
     */
-    public function isExpired(array $otp, int $expiration = 300): bool
+    public function isExpired(array $otp): bool
     {
-        $expiry = Carbon::createFromTimestamp($otp["otp_time"])->addSeconds($expiration);
+        $expiry = Carbon::createFromTimestamp($otp["otp_time"])->addSeconds($this->expiration);
         return $this->getTime()->greaterThan($expiry);
     }
 
@@ -96,9 +129,9 @@ class OTPService
          * @return bool
          * @return false if hash is not valid.
     */
-    public function verifyHash(array $otp, $salt = ""): bool
+    public function verifyHash(array $otp): bool
     {
-        return hash_equals($this->hash($otp, $salt), $otp["otp_hd"]);
+        return hash_equals($this->hash($otp, $this->salt), $otp["otp_hd"]);
     }
 
 
