@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\ForgotPasswordController;
+use App\Http\Controllers\Api\Auth\RegistrationController;
 use App\Http\Controllers\Api\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,5 +37,8 @@ Route::group(["controller" => VerifyEmailController::class], function ($router){
     $router->post('verifyEmailOTP', 'verifyEmailOTP' )->name("verifyEmailOTP");
     $router->post('verifyEmail', 'verifyEmail' )->name("verifyEmail");
 });
+
+Route::post('register', [RegistrationController::class, 'register'])->name("register");
+
 
     
