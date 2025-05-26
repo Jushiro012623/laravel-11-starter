@@ -5,7 +5,7 @@ namespace App\Http\Resources\V1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserResources extends JsonResource
+class AddressResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,15 +16,19 @@ class UserResources extends JsonResource
     {
         return [
             "id" => $this->id,
-            "email" => $this->email,
-            "username" => $this->username,
-            "verified" => $this->hasVerifiedEmail(),
-            $this->mergeWhen($request->routeIs('user.show'), function() {
+            "country" => $this->country,
+            "region" => $this->region,
+            "province" => $this->province,
+            "city" => $this->city,
+            "barangay" => $this->barangay,
+            "detail" => $this->detail,
+
+            $this->mergeWhen($request->routeIs("address.show"), function() {
                 return [
                     "created_at" => $this->created_at,
-                    "updated_at" => $this->updated_at,
+                    "updated_ad" => $this->updated_ad,
                 ];
-            })
+            }),
         ];
     }
 }

@@ -32,7 +32,6 @@ abstract class QueryFilters
                 $this->$key($value);
             }
         }
-
         return $builder;
     }
 
@@ -70,5 +69,4 @@ abstract class QueryFilters
             $this->builder->orderBy($columnName, $direction);
         }
     }
-    
 }
