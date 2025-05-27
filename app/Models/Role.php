@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
@@ -28,13 +29,13 @@ class Role extends Model
     }
 
     /**
-     * Get all of the comments for the Role
+     * Get the permissions for the role through the role_permission pivot table.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function permission(): HasManyThrough
+    public function permissions(): BelongsToMany
     {
-        return $this->hasManyThrough(Permission::class, RolePermission::class);
+        return $this->belongsToMany(Permission::class, 'role_permissions', 'role_id', 'permission_id');
     }
 
 }

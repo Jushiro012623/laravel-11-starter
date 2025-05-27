@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Address;
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserInfo;
@@ -19,8 +20,10 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
         $this->call([
             RoleSeeder::class,
+            PermissionSeeder::class,
             CategorySeeder::class,
             ItemSeeder::class,
+            RolePermissionSeeder::class,
         ]);
         $users = [
             [

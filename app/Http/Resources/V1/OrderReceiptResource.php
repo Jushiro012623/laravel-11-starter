@@ -17,6 +17,7 @@ class OrderReceiptResource extends JsonResource
     {
         return [
             "id" => $this->id,
+            "user_id" => $this->user_id,
             "reference_no" => $this->reference_no,
             "delivery_address" => new AddressResource($this->user->address->firstWhere("status", 1)),
             "order_item" => new Collection($this->items->select("name", "price")),

@@ -7,6 +7,7 @@ class ItemsFilter extends QueryFilters
     protected $sortable = [
         'name',
         'status',
+        'price',
         'createdAt' => 'created_at',
     ];
 
@@ -16,7 +17,7 @@ class ItemsFilter extends QueryFilters
                 ->orWhere('status', 'like', "%$value%");
         });
     }
-
+    
     public function category($value){
         return $this->builder->where("category_id", $value);
     }

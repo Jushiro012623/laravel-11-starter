@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Response as HttpResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-class GuestMiddleware
+class ValidatedUserMiddleware
 {
     /**
      * Handle an incoming request.
@@ -18,21 +18,9 @@ class GuestMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        try{
-            if (JWTAuth::user()) {
-                return HttpResponse::fail("Unauthorized Access", status: 401);
-            }
-
+        if(JWTAuth::user()->hasVerifiedEmail()) {
             return $next($request);
-
-        }catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
-
-            return $next($request);
-            
-        }catch (\Exception $e) {
-            
-            throw $e;
-            
         }
+        return HttpResponse::fail("Unauthorized Access: Validate Your Email First", status: 401);
     }
 }

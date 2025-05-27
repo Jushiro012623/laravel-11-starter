@@ -5,46 +5,59 @@ namespace App\Http\Controllers\Api\V1\Client;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Client\OrderRequest;
 use App\Http\Resources\V1\OrderReceiptResource;
-use App\Models\Order;
 use App\Repositories\V1\OrderRepository;
 use App\Services\V1\OrderService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Log\Logger;
 use Illuminate\Support\Facades\Response;
-use Psr\Http\Message\ResponseInterface;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class OrderController extends Controller
 {
+    public function __construct(
+        private Logger $logger,
+        private OrderService $orderService,
+        private OrderRepository $orderRepository,
+    )                                   
+    {}
 
-    public function placeOrder(OrderRequest $request, OrderService $orderService): JsonResponse
+    public function placeOrder(OrderRequest $request ): JsonResponse
     {   
-        if(!Auth::user()->hasActiveAddress()){
-            return Response::fail("Validate Your Email First", status: 401);   
+        if(!JWTAuth::user()->hasActiveAddress()){
+            return Response::fail("Unauthorized Access: Provide Delivery Address First", status: 401);   
         }
 
         $validated = $request->validated();
 
-        $payable = $orderService->computeAmountPayable($validated);
+        $payable = $this->orderService->computeAmountPayable($validated);
 
-        $order = $orderService->placeOrder($validated, $payable);
+        $order = $this->orderService->placeOrder($validated, $payable);
         $order = new OrderReceiptResource($order);
+
+        $this->logger->info("Order placed successfully", [
+            'user_id' => $request->user()->id,
+            'order_id' => $order->id,
+        ]);
 
         return Response::success("Order Placed Successfully", $order);
     }
 
-    public function processOrder(string $order, OrderRepository $orderRepository): JsonResponse
+    public function processOrder(string $order ): JsonResponse
     {   
-        if(Auth::user()->role_id !== '4'){
+        if(JWTAuth::user()->role_id !== '4'){
             return Response::fail("Unauthorize Access", status: 401);             
         }
 
-        $order = $orderRepository->getCustomerOrder($order);
-        $orderRepository->processOrder($order);
+        $order = $this->orderRepository->getCustomerOrder($order);
+        $this->orderRepository->processOrder($order);
         
         $order = new OrderReceiptResource($order);
 
+        $this->logger->info("Order process successfully", [
+            'employee_id' => JWTAuth::user()->id,
+            'order_id' => $order->id,
+            'user_id' => $order->user_id,
+        ]);
         return Response::success("Order Processed Successfully", $order);
     }
     

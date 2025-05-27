@@ -4,8 +4,9 @@ namespace App\Repositories\V1;
 
 use App\Models\Order;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Tymon\JWTAuth\Facades\JWTAuth;
+
 class OrderRepository
 {
     private const PENDING = 1;
@@ -13,7 +14,7 @@ class OrderRepository
 
 
     private function authUser() {
-        return Auth::user();
+        return JWTAuth::user();
     }
     
 
@@ -39,8 +40,8 @@ class OrderRepository
     public function processOrder(Order $order): void
     {
         $order->update([
-            "employee_id" => Auth::id(),
-            "status" => 2
+            "employee_id" => $this->authUser()->id,
+            "status" => self::ON_BOARD
         ]);
     }
     

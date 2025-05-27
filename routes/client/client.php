@@ -12,7 +12,7 @@ Route::get("items", ItemsController::class)->name("client.items");
 
 Route::group([
         "controller" => OrderController::class,
-        "middleware" => ["jwtAuth"]
+        "middleware" => ["jwtAuth", "verifiedUser"]
     ], function ($route){
         $route->post("placeOrder", "placeOrder")->name("placeOrder");
         $route->patch("processOrder/{order}", "processOrder")->name("processOrder");        
