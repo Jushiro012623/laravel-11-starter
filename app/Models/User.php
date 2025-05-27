@@ -4,9 +4,6 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -24,9 +21,8 @@ class User extends Authenticatable implements JWTSubject
     protected $fillable = [
         'username',
         'email',
-        'role_id',
+        'role',
         'password',
-        'status',
     ];
 
     /**
@@ -72,79 +68,11 @@ class User extends Authenticatable implements JWTSubject
     {
         return [
             'data' => [
-                'role' => $this->role_id,
+                'role' => $this->role,
                 'username' => $this->username,
                 'email' => $this->email,
                 'verified' => $this->hasVerifiedEmail(),
             ]
         ];
     }
-
-    /**
-     * Get the active address of the User
-     *
-     * @return \App\Models\Address
-     */
-    public function activeAddress() {
-        return $this->address()->where("status", 1)->first();
-    }
-    
-    /**
-     * Checks if the user has registered and address
-     *
-     * @return \App\Models\Address
-     */
-    public function hasActiveAddress() {
-        return $this->address()->where("status", 1)->exists() ;
-    }
-    
-    /**
-     * Get the role that owns the User
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function role(): BelongsTo
-    {
-        return $this->belongsTo(Role::class);
-    }
-
-    /**
-     * Get the profile associated with the User
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function profile(): HasOne
-    {
-        return $this->hasOne(UserInfo::class);
-    }
-
-    public function address(): HasMany
-    {
-        return $this->hasMany(Address::class);
-    }
-
-    /**
-     * Get all of the order for the User
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function order(): HasMany
-    {
-        return $this->hasMany(Order::class, "user_id");
-    }
-
-    /**
-     * Get all of the order for the User
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function served(): HasMany
-    {
-        return $this->hasMany(Order::class, "employee_id");
-    }
-
-
-    
-
-
 }

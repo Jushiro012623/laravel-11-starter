@@ -19,12 +19,8 @@ class UserResources extends JsonResource
             "email" => $this->email,
             "username" => $this->username,
             "verified" => $this->hasVerifiedEmail(),
-            $this->mergeWhen($request->routeIs('user.show'), function() {
-                return [
-                    "created_at" => $this->created_at,
-                    "updated_at" => $this->updated_at,
-                ];
-            })
+            "created_at" => $this->created_at,
+            "updated_at" => $this->updated_at,
         ];
     }
 }

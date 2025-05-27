@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests\Api\Auth;
 
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
 class LoginRequest extends FormRequest
 {
@@ -28,5 +26,4 @@ class LoginRequest extends FormRequest
             "password" => ["required", "string"]
         ];
     }
-
 }

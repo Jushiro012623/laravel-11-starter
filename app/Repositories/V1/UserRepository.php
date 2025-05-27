@@ -39,8 +39,4 @@ class UserRepository
     }
     
     
-    public function getUserActiveAddress(User $user) {
-        return $user->address->where("status", 1)->first();
-    }
-    
 }

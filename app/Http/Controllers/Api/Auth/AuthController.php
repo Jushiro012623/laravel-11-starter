@@ -21,15 +21,17 @@ class AuthController extends Controller
         $validated = $request->validated();
 
         $accessToken = $this->createAccessToken($validated);
-        
+
         if(!$accessToken)
         {
             $this->logger->warning("Failed Login Attempt: Invalid Credentials", [ "identifier" => $validated['username'] ]);
             return Response::error("Invalid Credentials", status: 401);
         }
-        
+
         $this->logger->info("User Logged In Successfully", [ "user_id" => Auth::id() ]);
+        
         return $this->respondWithToken("User Logged In Successfully", $accessToken);
+
     }
 
     public function me(): JsonResponse
