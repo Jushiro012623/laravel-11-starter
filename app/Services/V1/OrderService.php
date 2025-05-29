@@ -20,9 +20,9 @@ class OrderService
     {}
     
     
-    public function placeOrder(array $validated, array $paybale): Order {
+    public function placeOrder(array $validated, array $payable): Order {
 
-        $order = $this->orderRepository->createOrder($validated, $paybale);
+        $order = $this->orderRepository->createOrder($validated, $payable);
     
         $this->orderRepository->syncOrderItems($order, $validated);
         return $order;

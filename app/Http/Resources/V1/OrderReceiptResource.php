@@ -24,7 +24,7 @@ class OrderReceiptResource extends JsonResource
             "amount" => $this->amount,
             "sub_total" => $this->sub_total,
             "grand_total" => $this->grand_total,
-            "employee" => new UserResources($this->pocessedBy),
+            "employee_assigned" => new UserResources($this->pocessedBy),
             "created_at" => $this->created_at->format("Y:m:d H:i:s"),
             'discount' => $this->discount,
             "name" => $this->user->profile->first_name . " " . $this->user->profile->last_name,

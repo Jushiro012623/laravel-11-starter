@@ -38,6 +38,7 @@ class Order extends Model
             ->withTimestamps();
     }
 
+    
     /**
      * Get the user that owns the Order
      *

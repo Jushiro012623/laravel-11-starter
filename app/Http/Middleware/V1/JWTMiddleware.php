@@ -21,7 +21,8 @@ class JWTMiddleware
     public function handle(Request $request, Closure $next, $role = null): Response
     {
         try{
-            if (! JWTAuth::getToken()) {
+            
+            if (! $token = JWTAuth::getToken()) {
                 return HttpResponse::fail("Unauthorized Access", status: 401);
             }
 
@@ -29,10 +30,12 @@ class JWTMiddleware
                 return throw new TokenInvalidException();
             }
 
-            // $decodedToken = JWTAuth::getPayload($token);
-            // if ($role && $user->userRole->name !== $role && $decodedToken['data']['role'] !== $role) {
-            //     return HttpResponse::fail("Unauthorized Access", status: 401);
-            // }
+            $decodedToken = JWTAuth::getPayload($token);
+
+            $roles = explode('|', $role);
+            if ($role &&  !in_array($decodedToken['data']['role'], $roles) ) {
+                return HttpResponse::fail("Unauthorized Access", status: 401);
+            }
             
             return $next($request);
 

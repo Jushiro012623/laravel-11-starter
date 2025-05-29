@@ -21,7 +21,7 @@ class RegistrationController extends Controller
     )
     {}
     
-    public function register(RegistrationRequest $request)
+    public function __invoke(RegistrationRequest $request)
     {
         return DB::transaction(function () use ($request) {
 
@@ -33,4 +33,5 @@ class RegistrationController extends Controller
 
         });
     }
+    
 }

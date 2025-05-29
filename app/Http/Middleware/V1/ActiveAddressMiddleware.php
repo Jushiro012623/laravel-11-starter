@@ -4,12 +4,11 @@ namespace App\Http\Middleware\V1;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Response as HttpResponse;
+use Illuminate\Support\Facades\Response as HttpAddress;
 use Symfony\Component\HttpFoundation\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-class ValidatedUserMiddleware
+class ActiveAddressMiddleware
 {
     /**
      * Handle an incoming request.
@@ -18,9 +17,10 @@ class ValidatedUserMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(JWTAuth::user()->hasVerifiedEmail()) {
-            return $next($request);
+        if(!JWTAuth::user()->hasActiveAddress()){
+            return HttpAddress::fail("Access Denied: Provide Delivery Address First", status: 401);   
         }
-        return HttpResponse::fail("Unauthorized Access: Validate Your Email First", status: 401);
+        
+        return $next($request);
     }
 }

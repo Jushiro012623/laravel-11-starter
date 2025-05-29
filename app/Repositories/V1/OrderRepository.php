@@ -12,12 +12,10 @@ class OrderRepository
     private const PENDING = 1;
     private const ON_BOARD = 2;
 
-
     private function authUser() {
         return JWTAuth::user();
     }
     
-
     public function createOrder($validatedData, $amount): Order
     {
         $referenceNumber = Str::upper("REF".Carbon::now("asia/manila")->format("YmdHis").Str::random(6));
@@ -45,8 +43,5 @@ class OrderRepository
         ]);
     }
     
-    public function getCustomerOrder($order) {
-        return Order::where('id', $order)->firstOrFail();
-    }
     
 }

@@ -13,12 +13,12 @@ use Illuminate\Support\Facades\Route;
 */
 Route::group([
         "controller" => AuthController::class,
-    ], function ($router){
-        $router->post('login', 'login' )->name("login")->middleware(['guestUser']);
+    ], function (){
+        Route::post('login', 'login' )->name("login");
 
-        $router->post('me', 'me' )->name("me")->middleware(['jwtAuth']);
-        $router->post('logout', 'logout' )->name("logout")->middleware(['jwtAuth']);
-        $router->post('refresh', 'refresh' )->name("refresh")->middleware(['jwtAuth']);
+        Route::post('me', 'me' )->name("me")->middleware(['jwtAuth']);
+        Route::post('logout', 'logout' )->name("logout")->middleware(['jwtAuth']);
+        Route::post('refresh', 'refresh' )->name("refresh")->middleware(['jwtAuth']);
     }
 );
 
@@ -29,9 +29,9 @@ Route::group([
 */
 Route::group([
         "controller" => ForgotPasswordController::class
-    ], function ($router){
-        $router->post('forgotPasswordOTP', 'forgotPasswordOTP' )->name("forgotPasswordOTP");
-        $router->post('resetPassword', 'resetPassword' )->name("resetPassword");    
+    ], function (){
+        Route::post('forgotPasswordOTP', 'forgotPasswordOTP' )->name("forgotPasswordOTP");
+        Route::post('resetPassword', 'resetPassword' )->name("resetPassword");    
     }
 );
 
@@ -44,13 +44,10 @@ Route::group([
 Route::group([
         "controller" => VerifyEmailController::class,
         "middleware" => ['jwtAuth']
-    ], function ($router){
-        $router->post('verifyEmailOTP', 'verifyEmailOTP' )->name("verifyEmailOTP");
-        $router->post('verifyEmail', 'verifyEmail' )->name("verifyEmail");
+    ], function (){
+        Route::post('verifyEmailOTP', 'verifyEmailOTP' )->name("verifyEmailOTP");
+        Route::post('verifyEmail', 'verifyEmail' )->name("verifyEmail");
     }
 );
 
-Route::post('register', [RegistrationController::class, 'register'])->name("register")->middleware(['guestUser']);
-
-
-    
+Route::post('register', RegistrationController::class)->name("register")->middleware(['guestUser']);

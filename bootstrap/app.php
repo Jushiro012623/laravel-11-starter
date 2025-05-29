@@ -1,6 +1,7 @@
 <?php
 
 use App\Exceptions\Formatters\ApiExceptionFormatter;
+use App\Http\Middleware\V1\ActiveAddressMiddleware;
 use App\Http\Middleware\V1\GuestMiddleware;
 use App\Http\Middleware\V1\JWTMiddleware;
 use App\Http\Middleware\V1\ValidatedUserMiddleware;
@@ -19,15 +20,15 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         using: function(){
-            Route::prefix("api")->group(base_path("routes/client/client.php"));
-            Route::prefix("api/auth")->group(base_path("routes/auth/auth.php"));
+            Route::prefix("api")->middleware('api')->group(callback: base_path("routes/client/client.php"));
+            Route::prefix("api/auth")->middleware('api')->group(callback: base_path("routes/auth/auth.php"));
         }
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'jwtAuth' => JWTMiddleware::class,
             'guestUser' => GuestMiddleware::class,
-            'verifiedUser' => ValidatedUserMiddleware::class,
+            'activeAddress' => ActiveAddressMiddleware::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

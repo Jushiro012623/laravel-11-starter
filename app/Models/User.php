@@ -72,10 +72,11 @@ class User extends Authenticatable implements JWTSubject
     {
         return [
             'data' => [
-                'role' => $this->role_id,
+                'role' => $this->role->name,
                 'username' => $this->username,
                 'email' => $this->email,
                 'verified' => $this->hasVerifiedEmail(),
+                'permissions' => $this->role->permissions->pluck('name')->toArray(),
             ]
         ];
     }
@@ -96,6 +97,16 @@ class User extends Authenticatable implements JWTSubject
      */
     public function hasActiveAddress() {
         return $this->address()->where("status", 1)->exists() ;
+    }
+    
+    /**
+     * Checks if the user has the provided role
+     *
+     * @return bool
+     */
+    public function hasRole($role): bool {
+
+        return in_array($this->role->name, explode('|', strtolower($role)));
     }
     
     /**
