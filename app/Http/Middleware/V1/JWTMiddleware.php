@@ -21,11 +21,10 @@ class JWTMiddleware
     public function handle(Request $request, Closure $next, $role = null): Response
     {
         try{
-            
             if (! $token = JWTAuth::getToken()) {
                 return HttpResponse::fail("Unauthorized Access", status: 401);
             }
-
+            
             if (! JWTAuth::user()) {
                 return throw new TokenInvalidException();
             }

@@ -18,7 +18,10 @@ Route::group([
             ->name("placeOrder")
             ->middleware(["activeAddress"]);
 
-        Route::patch("processOrder/{order}", "processOrder")
-            ->name("processOrder");        
+        Route::patch("prepareOrder/{order}", "prepareOrder")
+            ->name("prepareOrder");        
+
+        Route::patch("shipOrder/{order}", "shipOrder")
+            ->name("shipOrder");        
     }
 );

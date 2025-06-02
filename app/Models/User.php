@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Nette\Utils\Arrays;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
@@ -104,9 +105,13 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return bool
      */
-    public function hasRole($role): bool {
+    public function hasRole( array|string $roles): bool {
 
-        return in_array($this->role->name, explode('|', strtolower($role)));
+        if(is_array($roles)){
+            return in_array($this->role->name, $roles);
+        }
+
+        return in_array($this->role->name, explode('|', strtolower($roles)));
     }
     
     /**

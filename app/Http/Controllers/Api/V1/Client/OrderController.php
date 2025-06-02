@@ -24,9 +24,15 @@ class OrderController extends Controller
     )                                   
     {}
 
-    public function placeOrder(OrderRequest $request, Order $order): JsonResponse
+    /**
+     * Place a new order for the authenticated user.
+     *
+     * @param OrderRequest $request
+     * @return JsonResponse
+     */
+    public function placeOrder(OrderRequest $request): JsonResponse
     {   
-        Gate::authorize('create', $order);
+        Gate::authorize('create', Order::class);
 
         $validated = $request->validated();
 
@@ -43,21 +49,50 @@ class OrderController extends Controller
         return Response::success("Order Placed Successfully", $order);
     }
 
-    public function processOrder(Order $order): JsonResponse
-    {          
+    /**
+     * Mark an order as prepared by an employee.
+     *
+     * @param Order $order
+     * @return JsonResponse
+     */
+    public function prepareOrder(Order $order): JsonResponse
+    {   
         Gate::authorize('assign', $order);
-
-        $this->orderRepository->processOrder($order);        
+        
+        $this->orderRepository->prepareOrder($order);        
         $order = new OrderReceiptResource($order);
 
-        $this->logger->info("Order process successfully", [
+        $this->logger->info("Order processed successfully", [
+            'employee_id' => JWTAuth::user()->id,
+            'order_id' => $order->id,
+            'user_id' => $order->user_id,
+        ]);
+        
+        return Response::success("Order Processed Successfully", $order);
+    }
+
+    /**
+     * Mark an order as shipped by an employee.
+     *
+     * @param Order $order
+     * @return JsonResponse
+     */
+    public function shipOrder(Order $order): JsonResponse
+    {
+        Gate::authorize('assign', $order);
+
+        $this->orderRepository->shipOrder($order);        
+        $order = new OrderReceiptResource($order);
+
+        $this->logger->info("Order shipped successfully", [
             'employee_id' => JWTAuth::user()->id,
             'order_id' => $order->id,
             'user_id' => $order->user_id,
         ]);
 
-        return Response::success("Order Processed Successfully", $order);
+        return Response::success("Order Shipped Successfully", $order);
     }
+    
 
 
     

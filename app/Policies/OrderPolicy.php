@@ -21,7 +21,7 @@ class OrderPolicy
     }
     
 
-    public function assign(User $user): bool {
+    public function assign(User $user): bool {      
 
         if($user->hasRole("super_admin|admin")){
             return true;
@@ -29,4 +29,6 @@ class OrderPolicy
 
         return $user->hasRole('employee') && $user->role->hasPermission("order:assign");
     }
+
+    
 }

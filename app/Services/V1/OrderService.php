@@ -9,7 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 
 class OrderService
-{
+{   
     /**
      * Create a new class instance.
      */
@@ -18,7 +18,6 @@ class OrderService
         private ItemRepository $itemRepository
     )
     {}
-    
     
     public function placeOrder(array $validated, array $payable): Order {
 
@@ -43,11 +42,4 @@ class OrderService
         return $payable;
 
     }
-
-
-
-
-
-
-    
 }

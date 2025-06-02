@@ -5,57 +5,93 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Facades\OTP;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Auth\VerifyEmailRequest;
+use App\Jobs\MailJob;
+use App\Mail\EmailVerification;
 use App\Repositories\V1\UserRepository;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Log\Logger;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
+/**
+ * Handles email verification via OTP.
+ */
 class VerifyEmailController extends Controller
 {
+    /**
+     * Whether to expose the OTP code in the response (local dev mode).
+     *
+     * @var bool
+     */
+    private bool $inLocalState;
 
-    private $inLocalState;
-
+    /**
+     * Create a new controller instance.
+     *
+     * @param Logger $logger
+     * @param UserRepository $userRepository
+     */
     public function __construct(
         private Logger $logger,
         private UserRepository $userRepository
-    )
-    {
+    ) {
         $this->inLocalState = config("app.ENABLE_OTP_SHOW");
     }
-    
-    public function verifyEmailOTP() {
-        
-        if(Auth::user()->hasVerifiedEmail()){
+
+    /**
+     * Send an OTP for email verification.
+     *
+     * @return JsonResponse
+     */
+    public function verifyEmailOTP(): JsonResponse
+    {
+        $user = JWTAuth::user();
+
+        if ($user->hasVerifiedEmail()) {
             return Response::fail("This Email is Already Verified", status: 400);
         }
 
         $otp = OTP::numeric()->generate();
-        $otp["otp_code"] = $this->inLocalState ? $otp["otp_code"] : null;
-        
-        // TODO SEND EMAIL 
 
-        $this->logger->info("Email Verification Code Was Sent", ["user_email" => Auth::user()->email ]);
+        MailJob::dispatch($user->email, new EmailVerification($otp));
+
+        // Hide OTP in response unless in local dev mode
+        $otp["otp_code"] = $this->inLocalState ? $otp["otp_code"] : null;
+
+        $this->logger->info("Email Verification Code Was Sent", [
+            "user_email" => $user->email
+        ]);
+
         return Response::success("Verification Code Was Sent Successfully", $otp);
     }
 
-    public function verifyEmail(VerifyEmailRequest $request)
+    /**
+     * Verify the user's email using the submitted OTP.
+     *
+     * @param VerifyEmailRequest $request
+     * @return JsonResponse
+     */
+    public function verifyEmail(VerifyEmailRequest $request): JsonResponse
     {
         $validated = $request->validated();
 
-        $user = Auth::user();
+        $user = JWTAuth::user();
 
-        if(!OTP::validate($validated))
-        {
-            $this->logger->warning("Verify Email Failed: Expired or Invalid OTP", ["email" => $user->email]);
+        if (!OTP::validate($validated)) {
+            $this->logger->warning("Verify Email Failed: Expired or Invalid OTP", [
+                "email" => $user->email
+            ]);
+
             return Response::fail(message: 'Expired or Invalid OTP', status: 400);
         }
-        
+
         $user->markEmailAsVerified();
 
-        $this->logger->info('User Verified Email Successfully', ['user_id' => $user->id,]);
+        $this->logger->info('User Verified Email Successfully', [
+            'user_id' => $user->id
+        ]);
+
         return Response::success('Email Verified Successfully');
-        
     }
-    
 }
