@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Auth\RegistrationRequest;
 use App\Http\Resources\V1\UserResources;
+use App\Models\Address;
 use App\Models\User;
+use App\Models\UserInfo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Log\Logger;
 use Illuminate\Support\Facades\DB;
@@ -35,16 +37,19 @@ class RegistrationController extends Controller
     {
         return DB::transaction(function () use ($request) {
 
-            // Create new user with validated request data
-            $user = User::create($request->validated());
+            $validated = $request->validated();
 
-            // Transform user using resource class
+            $user = User::create($validated);
+
+            $validated['user_id'] = $user->id;
+
+            UserInfo::create($validated);
+            Address::create($validated);    
+
             $userResource = new UserResources($user);
 
-            // Log registration event
             $this->logger->info("User Registered Successfully", ['user_id' => $user->id]);
 
-            // Return success response with resource and 201 status
             return Response::success("User Registered Successfully", $userResource, 201);
         });
     }

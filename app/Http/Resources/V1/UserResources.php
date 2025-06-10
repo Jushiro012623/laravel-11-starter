@@ -19,6 +19,17 @@ class UserResources extends JsonResource
             "email" => $this->email,
             "username" => $this->username,
             "verified" => $this->hasVerifiedEmail(),
+            $this->mergeWhen($request->routeIs('register'), function () {
+                return [
+                    "first_name" => $this->profile->first_name,
+                    "last_name" => $this->profile->last_name,
+                    "middle_name" => $this->profile->middle_name,
+                    "suffix" => $this->profile->suffix,
+                    "avatar" => $this->profile->avatar,
+                    "mobile" => $this->profile->mobile,
+                    $this->merge(new AddressResource($this->activeAddress()))
+                ];
+            }),
             $this->mergeWhen($request->routeIs('user.show'), function() {
                 return [
                     "created_at" => $this->created_at,

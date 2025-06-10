@@ -9,19 +9,6 @@ use Illuminate\Support\Facades\Route;
 Route::get("categories", CategoriesController::class)->name("client.categories");
 Route::get("items", ItemsController::class)->name("client.items");
 
-Route::group([
-        "controller" => OrderController::class,
-        "middleware" => ["jwtAuth", "verified"]
-    ], function (){
-
-        Route::post("placeOrder", "placeOrder")
-            ->name("placeOrder")
-            ->middleware(["activeAddress"]);
-
-        Route::patch("prepareOrder/{order}", "prepareOrder")
-            ->name("prepareOrder");        
-
-        Route::patch("shipOrder/{order}", "shipOrder")
-            ->name("shipOrder");        
-    }
-);
+Route::apiResource('orders', OrderController::class)
+    ->middleware(['jwtAuth', 'verifiedUser'])
+    ->names("clientOrders");

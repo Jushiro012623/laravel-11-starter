@@ -30,12 +30,12 @@ class JWTMiddleware
             }
 
             $decodedToken = JWTAuth::getPayload($token);
-
+            
             $roles = explode('|', $role);
             if ($role &&  !in_array($decodedToken['data']['role'], $roles) ) {
                 return HttpResponse::fail("Unauthorized Access", status: 401);
             }
-            
+
             return $next($request);
 
         } catch (TokenExpiredException $e) {

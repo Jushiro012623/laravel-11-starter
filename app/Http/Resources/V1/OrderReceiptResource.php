@@ -19,17 +19,21 @@ class OrderReceiptResource extends JsonResource
             "id" => $this->id,
             "user_id" => $this->user_id,
             "reference_no" => $this->reference_no,
-            "delivery_address" => new AddressResource($this->user->address->firstWhere("status", 1)),
+            "delivery_address" => new AddressResource($this->user->activeAddress()),
             "order_item" => new Collection($this->items->select("name", "price")),
             "amount" => $this->amount,
             "sub_total" => $this->sub_total,
             "grand_total" => $this->grand_total,
-            "employee_assigned" => new UserResources($this->pocessedBy),
             "created_at" => $this->created_at->format("Y:m:d H:i:s"),
             'discount' => $this->discount,
             "name" => $this->user->profile->first_name . " " . $this->user->profile->last_name,
             "email" => $this->user->email,
             "status" => $this->status,
+            $this->mergeWhen($this->status == 3, function(){
+                return [
+                    "rider" => new UserResources($this->pocessedBy)
+                ];
+            }),
         ];
     }
 }

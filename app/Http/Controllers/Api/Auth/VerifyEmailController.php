@@ -10,15 +10,13 @@ use App\Mail\EmailVerification;
 use App\Repositories\V1\UserRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Log\Logger;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 /**
  * Handles email verification via OTP.
  */
 class VerifyEmailController extends Controller
-{
+{   
     /**
      * Whether to expose the OTP code in the response (local dev mode).
      *
@@ -41,21 +39,21 @@ class VerifyEmailController extends Controller
 
     /**
      * Send an OTP for email verification.
-     *
+     *      
      * @return JsonResponse
      */
-    public function verifyEmailOTP(): JsonResponse
+    public function verifyEmailOTP(): JsonResponse              
     {
-        $user = JWTAuth::user();
-
+        $user = request()->user();
+        
         if ($user->hasVerifiedEmail()) {
             return Response::fail("This Email is Already Verified", status: 400);
-        }
+        }           
 
         $otp = OTP::numeric()->generate();
 
         MailJob::dispatch($user->email, new EmailVerification($otp));
-
+        
         // Hide OTP in response unless in local dev mode
         $otp["otp_code"] = $this->inLocalState ? $otp["otp_code"] : null;
 
@@ -76,13 +74,12 @@ class VerifyEmailController extends Controller
     {
         $validated = $request->validated();
 
-        $user = JWTAuth::user();
+        $user = $request->user();   
 
         if (!OTP::validate($validated)) {
             $this->logger->warning("Verify Email Failed: Expired or Invalid OTP", [
                 "email" => $user->email
             ]);
-
             return Response::fail(message: 'Expired or Invalid OTP', status: 400);
         }
 

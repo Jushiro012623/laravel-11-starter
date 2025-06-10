@@ -1,16 +1,21 @@
 <?php
 
-namespace App\Http\Requests\Api\Auth;
+namespace App\Http\Requests\Api\V1\Client;
 
+use App\Models\Order;
 use Illuminate\Foundation\Http\FormRequest;
-class ForgotPasswordRequest extends FormRequest
+use Illuminate\Support\Facades\Gate;
+
+class UpdateOrderRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return Gate::authorize('updateStatus', Order::class)->allow() 
+            ? true
+            : false;
     }
 
     /**
@@ -21,22 +26,15 @@ class ForgotPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "email" => ["required", "email", "exists:users,email"],
-            "password" => ["required", "string", "min:7"],
-            "otp_reference_no" => ["required", "string"],
-            "otp_time" => ["required"],
-            "otp_code" => ["required", "string"],
-            "otp_hd" => ["required", "string"],
+            'status' => ['required', "in:0,1,2,3,4,5"]
         ];
     }
 
     public function messages()
     {
         return [
-            "email.exists" => "No User Found"
+            'status' => 'Invalid Status'
         ];
     }
-
     
-
 }

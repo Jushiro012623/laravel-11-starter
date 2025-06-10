@@ -21,7 +21,7 @@ class OrderPolicy
     }
     
 
-    public function assign(User $user): bool {      
+    public function updateStatus(User $user): bool {      
 
         if($user->hasRole("super_admin|admin")){
             return true;
@@ -30,5 +30,18 @@ class OrderPolicy
         return $user->hasRole('employee') && $user->role->hasPermission("order:assign");
     }
 
+    public function show(User $user, Order $order) {
+
+        if($user->hasRole("admin|super_admin")){
+            return true;
+        }
+
+        if($user->hasRole('employee')){
+            return $order->deliveredBy?->id === $user->id;
+        }
+
+        return $user->id === $order->user_id && $user->role->hasPermission("order:read:own");
+    }
+    
     
 }

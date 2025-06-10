@@ -154,9 +154,9 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function served(): HasMany
+    public function rider(): HasMany
     {
-        return $this->hasMany(Order::class, "employee_id");
+        return $this->hasMany(Order::class, "rider_id");
     }
 
 

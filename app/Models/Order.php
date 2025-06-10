@@ -15,7 +15,7 @@ class Order extends Model
 
     protected $fillable = [
         "user_id",
-        "employee_id",
+        "rider_id",
         "address_id",
         "status",
         "amount",
@@ -54,9 +54,9 @@ class Order extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function pocessedBy(): BelongsTo
+    public function deliveredBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'employee_id');
+        return $this->belongsTo(User::class, 'rider_id');
     }
 
     

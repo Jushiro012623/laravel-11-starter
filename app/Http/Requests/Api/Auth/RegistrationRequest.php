@@ -25,6 +25,19 @@ class RegistrationRequest extends FormRequest
             "username" => ["required", "string", "min:8", "unique:users,username"],
             "email" => ["required", "email", "unique:users,email"],
             "password" => ["required", "string", "min:8"],
+            
+            "first_name" => ["required", "string"],
+            "last_name" => ["required", "string"],
+            "middle_name" => ["nullable", "string"],
+            "mobile" => ["required", "string"],
+            "suffix" => ["nullable", "string"],
+
+            "country" => ["required", "string"],
+            "city" => ["required", "string"],
+            "province" => ["required", "string"],
+            "region" => ["required", "string"],
+            "barangay" => ["required", "string"],
+            "detail" => ["required", "string"],
         ];
     }
 

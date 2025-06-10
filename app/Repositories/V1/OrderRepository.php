@@ -20,15 +20,6 @@ class OrderRepository
     private const DELIVERED = 4;
     private const CANCEL = 5;
 
-    /**
-     * Get the currently authenticated user.
-     *
-     * @return \App\Models\User|null
-     */
-    private function authUser()
-    {
-        return JWTAuth::user();
-    }
 
     /**
      * Create a new order.
@@ -39,7 +30,7 @@ class OrderRepository
      */
     public function createOrder($validatedData, $amount): Order
     {
-        $user = $this->authUser();
+        $user = request()->user();
         $referenceNo = Str::upper('REF' . Carbon::now('Asia/Manila')->format('YmdHis') . Str::random(6));
         
         $orderData = array_merge($validatedData, $amount, [
@@ -54,7 +45,7 @@ class OrderRepository
 
         return $order;
     }
-
+    
     /**
      * Sync order items to an order.
      *
@@ -73,50 +64,18 @@ class OrderRepository
      * @param Order $order
      * @return void
      */
-    public function prepareOrder(Order $order): void
+    public function updateOrder(Order $order, $validated): void
     {
-        $order->update([
-            "employee_id" => $this->authUser()->id,
-            "status" => self::PREPARING
-        ]);
+        $status = $validated['status'];
+
+        $order->status = $status;
+
+        if($status == 3){
+            $order->rider_id = request()->user()->id;
+        }
+        
+        $order->save;
     }
 
-    /**
-     * Mark the order as shipped (on the way).
-     *
-     * @param Order $order
-     * @return void
-     */
-    public function shipOrder(Order $order): void
-    {
-        $order->update([
-            "status" => self::ON_BOARD
-        ]);
-    }
-
-    /**
-     * Mark the order as delivered.
-     *
-     * @param Order $order
-     * @return void
-     */
-    public function deliverOrder(Order $order): void
-    {
-        $order->update([
-            "status" => self::DELIVERED
-        ]);
-    }
-
-    /**
-     * Cancel the order.
-     *
-     * @param Order $order
-     * @return void
-     */
-    public function cancelOrder(Order $order): void
-    {
-        $order->update([
-            "status" => self::CANCEL
-        ]);
-    }
+    
 }

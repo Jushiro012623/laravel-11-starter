@@ -17,11 +17,11 @@ return new class extends Migration
             $table->foreignId("user_id");
             $table->string("amount");
             $table->string("notes")->nullable();
-            $table->foreignId("employee_id")->nullable();
-            $table->string("status")->default(1)->comment("1: Pending, 2: Preparing 3: OnBoard 3: Delivered 4: Canceled");
+            $table->foreignId("rider_id")->nullable();
+            $table->string("status")->default(1)->comment("1: Pending, 2: Preparing 3: OnBoard 4: Delivered 5: Canceled");
             $table->string("address_id");
             $table->string("discount");
-            $table->string("sub_total");
+            $table->string("sub_total");        
             $table->string("grand_total");
             $table->timestamps();
         });
